@@ -74,8 +74,7 @@ fun App() {
             .background(MaterialTheme.colorScheme.background)
             .horizontalScroll(ScrollState(1), true)) {
             Column (horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
-                .weight(2f)
-                .background(MaterialTheme.colorScheme.background),
+                .weight(2f),
                 verticalArrangement = Arrangement.SpaceAround ) {
                 Inputs()
             }
@@ -149,9 +148,11 @@ fun Inputs(){
         }
     }
 
-    Column (modifier = Modifier.verticalScroll(ScrollState(1), true).fillMaxSize()) {
+    Column (modifier = Modifier.verticalScroll(ScrollState(1), true).fillMaxSize().padding(horizontal = 5.dp)) {
 
-        Text(modifier = Modifier.align(Alignment.CenterHorizontally).padding(top=50.dp), text = "INPUTS")
+        Text(modifier = Modifier.align(Alignment.CenterHorizontally).padding(top=50.dp),
+            text = "INPUTS",
+            color = MaterialTheme.colorScheme.onBackground)
 
         OutlinedTextField(modifier = Modifier.align(Alignment.CenterHorizontally),
             value = a2,   onValueChange = {a2 = it },   label = { Text( "Link 1") }, keyboardOptions = KeyboardOptions(keyboardType= KeyboardType.Number), maxLines = 1)
@@ -180,7 +181,8 @@ fun Inputs(){
             Text(modifier = Modifier
                 .padding(top = 50.dp)
                 .align(Alignment.CenterHorizontally),
-                text = "OUTPUTS")
+                text = "OUTPUTS",
+                color = MaterialTheme.colorScheme.onBackground)
 
             Card (modifier = Modifier
                 .padding(5.dp)
