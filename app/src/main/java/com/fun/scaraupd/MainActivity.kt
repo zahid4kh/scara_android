@@ -6,12 +6,18 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.EaseIn
+import androidx.compose.animation.core.EaseInBounce
+import androidx.compose.animation.core.EaseInOut
+import androidx.compose.animation.core.EaseInOutBack
 import androidx.compose.animation.core.EaseOutBack
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +26,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -49,6 +56,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.text.isDigitsOnly
 import androidx.wear.compose.material.ContentAlpha
 import com.`fun`.scaraupd.ui.theme.ScaraUpdTheme
+import com.`fun`.scaraupd.ui.theme.outlineDark
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.pow
@@ -86,13 +94,13 @@ fun App() {
     }
 }
 // Initializing results
-var theta1_1 = ""
-var theta1_2 = ""
-var theta2_1 = ""
-var theta2_2 = ""
-var theta4_1 = ""
-var theta4_2 = ""
-var d = ""
+var theta1_1 = "0"
+var theta1_2 = "0"
+var theta2_1 = "0"
+var theta2_2 = "0"
+var theta4_1 = "0"
+var theta4_2 = "0"
+var d = "0"
 // End
 @Composable
 fun Inputs(){
@@ -107,13 +115,6 @@ fun Inputs(){
     val myVals = listOf(a2, a3, px, py, pz, tcp, tool)
 
     if (myVals.all { it.isEmpty() }){
-//        a2 = "".toDoubleOrNull().toString();
-//        a3 = "".toDoubleOrNull().toString();
-//        px = "".toDoubleOrNull().toString();
-//        py = "".toDoubleOrNull().toString();
-//        pz = "".toDoubleOrNull().toString();
-//        tcp = "".toDoubleOrNull().toString();
-//        tool = "".toDoubleOrNull().toString()
         a2 = ""
         a3 = ""
         px = ""
@@ -139,18 +140,29 @@ fun Inputs(){
             val sin_fi = sqrt(1 - cos_fi.pow(2))
             val fi = atan2(sin_fi, cos_fi)
             d = (tcpDouble.toDouble() - pzDouble.toDouble()).toString()
-            theta1_1 = (((alpha_1 - beta1) * 180) / PI).toString()
-            theta1_2 = (((alpha_1 + beta1) * 180) / PI).toString()
-            theta2_1 = (((PI - fi) * 180) / PI).toString()
-            theta2_2 = (((-PI - fi) * 180) / PI).toString() // FIX
-            theta4_1 = (((theta1_1.toDouble() + theta2_1.toDouble() - toolDouble.toDouble()) * 180) / PI).toString() // FIX
-            theta4_2 = (((theta1_2.toDouble() + theta2_2.toDouble() - toolDouble.toDouble()) * 180) / PI).toString() //FIX
+
+            theta1_1 = (alpha_1 - beta1).toString()
+
+            theta1_2 = (alpha_1 + beta1).toString()
+
+            theta2_1 = (PI - fi).toString()
+
+            theta2_2 = (-(PI - fi)) .toString()// FIX
+
+            theta4_1 = (theta1_1.toDouble() + theta2_1.toDouble() - toolDouble.toDouble()).toString()// FIX
+
+            theta4_2 = (theta1_2.toDouble() + theta2_2.toDouble() - toolDouble.toDouble()).toString() //FIX
         }
     }
 
-    Column (modifier = Modifier.verticalScroll(ScrollState(1), true).fillMaxSize().padding(horizontal = 5.dp)) {
+    Column (modifier = Modifier
+        .verticalScroll(rememberScrollState(), true)
+        .fillMaxSize()
+        .padding(horizontal = 5.dp)) {
 
-        Text(modifier = Modifier.align(Alignment.CenterHorizontally).padding(top=50.dp),
+        Text(modifier = Modifier
+            .align(Alignment.CenterHorizontally)
+            .padding(top = 50.dp),
             text = "INPUTS",
             color = MaterialTheme.colorScheme.onBackground)
 
@@ -174,7 +186,7 @@ fun Inputs(){
 
     @Composable
     fun Outputs(){
-        Column (modifier = Modifier.verticalScroll(state = ScrollState(1), enabled = true)) {
+        Column (modifier = Modifier.verticalScroll(rememberScrollState(), enabled = true)) {
 
             var expanded by rememberSaveable {mutableStateOf(false)}
             val rotationState by animateFloatAsState(targetValue = if (expanded) 180f else 0f, label = "")
@@ -198,7 +210,7 @@ fun Inputs(){
                         .padding(12.dp)){
                     Row(verticalAlignment = Alignment.CenterVertically){
 
-                        Text(modifier = Modifier.weight(4f), text="Elbow-up", fontWeight = FontWeight.Bold)
+                        Text(modifier = Modifier.weight(4f), text="Elbow-down", fontWeight = FontWeight.Bold)
                         IconButton(modifier = Modifier
                             .weight(1f)
                             .alpha(ContentAlpha.medium)
@@ -208,10 +220,10 @@ fun Inputs(){
                         }
                     }
                     if (expanded){
-                        OutlinedTextField(readOnly=true, value = theta1_1, onValueChange = { theta1_1 = it}, label = { Text( "Theta 1") })
-                        OutlinedTextField(readOnly=true, value = theta2_1, onValueChange = { theta2_1 = it }, label = { Text( "Theta 2") })
+                        OutlinedTextField(readOnly=true, value = (theta1_1.toDouble() * 180 / PI).toString(), onValueChange = { theta1_1 = it}, label = { Text( "Theta 1") })
+                        OutlinedTextField(readOnly=true, value = (theta2_1.toDouble() * 180 / PI).toString(), onValueChange = { theta2_1 = it }, label = { Text( "Theta 2") })
                         OutlinedTextField(readOnly=true, value = d,        onValueChange = {d}, label = { Text( "Z-stroke") })
-                        OutlinedTextField(readOnly=true, value = theta4_1, onValueChange = { theta4_1 = it}, label = { Text( "Theta 4") })
+                        OutlinedTextField(readOnly=true, value = (theta4_1.toDouble() * 180 / PI).toString(), onValueChange = { theta4_1 = it}, label = { Text( "Theta 4") })
                     }
                 }
             }
@@ -221,7 +233,7 @@ fun Inputs(){
                 .padding(5.dp)
                 .fillMaxWidth()
                 .align(Alignment.CenterHorizontally)
-                .animateContentSize(animationSpec = tween(550, easing = LinearOutSlowInEasing)),
+                .animateContentSize(animationSpec = tween(550, easing = EaseOutBack)),
                 shape = RoundedCornerShape(15.dp),
                 onClick = {expanded2 = !expanded2}){
 
@@ -229,7 +241,7 @@ fun Inputs(){
                     .fillMaxSize()
                     .padding(12.dp)){
                     Row(verticalAlignment = Alignment.CenterVertically){
-                        Text(modifier = Modifier.weight(4f), text="Elbow-down", fontWeight = FontWeight.Bold)
+                        Text(modifier = Modifier.weight(4f), text="Elbow-up", fontWeight = FontWeight.Bold)
                         IconButton(modifier = Modifier
                             .weight(1f)
                             .alpha(ContentAlpha.medium)
@@ -239,10 +251,10 @@ fun Inputs(){
                         }
                     }
                     if (expanded2){
-                        OutlinedTextField(readOnly=true, value = theta1_2, onValueChange = {theta1_2}, label = { Text( "Theta 1") })
-                        OutlinedTextField(readOnly=true, value = theta2_2, onValueChange = {theta2_2}, label = { Text( "Theta 2") })
-                        OutlinedTextField(readOnly=true, value = d, onValueChange = {d}, label = { Text( "Z-stroke") })
-                        OutlinedTextField(readOnly=true, value = theta4_2, onValueChange = {theta4_2}, label = { Text( "Theta 4") })
+                        OutlinedTextField(readOnly=true, value = (theta1_2.toDouble() * 180 / PI).toString(), onValueChange = {theta1_2 = it}, label = { Text( "Theta 1") })
+                        OutlinedTextField(readOnly=true, value = (theta2_2.toDouble() * 180 / PI).toString(), onValueChange = {theta2_2 = it}, label = { Text( "Theta 2") })
+                        OutlinedTextField(readOnly=true, value = d, onValueChange = {d = it}, label = { Text( "Z-stroke") })
+                        OutlinedTextField(readOnly=true, value = (theta4_2.toDouble() * 180 / PI).toString(), onValueChange = {theta4_2 = it}, label = { Text( "Theta 4") })
                     }
                 }
 
